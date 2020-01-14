@@ -13,7 +13,6 @@ SELECT
 FROM
 `seismic-sweep-264823`.stackoverflow_caliva.posts_questions
 where creation_date >= '2019-08-01' and answer_count > 1
-order by id
 LIMIT 50000
 )
 ,
