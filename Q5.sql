@@ -1,13 +1,10 @@
 /*
  * Question 5
- * Among the 10000 most viewed questions, what on average is the number of days between the original question being created and being edited? Treat null edit dates as 0.
+ * Among the 10,000 most viewed questions, what on average is the number of days between the original question being created and being edited? Treat null edit dates as 0.
  * 
  * Answer
- * For the 10,000 most viewed questions, the average days between creation and edit are 1,779.3704.
- * 
+ * For the 10,000 most viewed questions, the average days between creation and edit are 1,779.37.
  */
-
-
 with most_views as
 (
 SELECT
@@ -18,7 +15,6 @@ SELECT
 	sum(view_count) total_views
 FROM
 	`seismic-sweep-264823`.stackoverflow_caliva.posts_questions
---where creation_date >= '2019-08-01'
 group by 
 id,
 creation_date,
@@ -30,5 +26,3 @@ select
 avg(days_between_creation_and_edit) avg_days_between_edits 
 from most_views
 ;
-
-select * from `seismic-sweep-264823`.stackoverflow_caliva.posts_questions where last_edit_date is null

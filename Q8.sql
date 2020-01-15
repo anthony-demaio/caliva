@@ -1,10 +1,9 @@
 /*
  * Question 8
 How many days, on average, pass between a single user posting a question?
-?
  *  
  * Answer
- * 84.35271336565488
+ * 84.35 days.
  */
 
 with days_between as (

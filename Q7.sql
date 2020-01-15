@@ -3,7 +3,7 @@
 How many days, on average, pass between a single user posting an answer to any question?
  *  
  * Answer
- * 36 days.
+ * 36.35 days.
  */
 
 with days_between as (
