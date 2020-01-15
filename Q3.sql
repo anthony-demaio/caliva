@@ -1,11 +1,11 @@
-  /*
+/*
 *  Question 3
 What are the ten “hardest” badges to earn on average?
 Measured by the time between a user account being created and the most recently received badge, where that badge is not one of the first 5 badges that the user earned and the account is over 1 year old with more than 10 answers.
 */
 select
 badge_name,
-days_between_account_creation_and_Latest_badge
+avg(days_between_account_creation_and_Latest_badge) day_to_achieve
 from (
 SELECT
   badges.user_id AS user_id,
@@ -37,5 +37,6 @@ WHERE
     answer_cnt>10)  
 )
 where row_number > 5
-order by days_between_account_creation_and_Latest_badge desc
+group by badge_name
+order by day_to_achieve desc
 limit 10
