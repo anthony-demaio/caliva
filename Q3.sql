@@ -5,13 +5,12 @@ Measured by the time between a user account being created and the most recently 
 */
 select
 badge_name,
-avg(days_between_account_creation_and_Latest_badge) day_to_achieve
+avg(days_between_account_creation_and_Latest_badge) avg_days_to_achieve
 from (
 SELECT
   badges.user_id AS user_id,
   users.display_name,
   badges.name AS badge_name,
-  TIMESTAMP_DIFF(badges.date, users.creation_date, DAY) AS days_between_badges,
   TIMESTAMP_DIFF(MAX(badges.date) OVER(PARTITION BY badges.user_id), users.creation_date, DAY) AS days_between_account_creation_and_Latest_badge,
   ROW_NUMBER() OVER (PARTITION BY badges.user_id ORDER BY badges.date) AS row_number
 FROM
@@ -38,5 +37,5 @@ WHERE
 )
 where row_number > 5
 group by badge_name
-order by day_to_achieve desc
+order by avg_days_to_achieve desc
 limit 10
