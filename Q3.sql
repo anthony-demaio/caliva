@@ -1,27 +1,41 @@
-/*
+  /*
+*  Question 3
 What are the ten “hardest” badges to earn on average?
 Measured by the time between a user account being created and the most recently received badge, where that badge is not one of the first 5 badges that the user earned and the account is over 1 year old with more than 10 answers.
 */
-
-SELECT badge_name AS First_Gold_Badge, 
-       COUNT(1) AS Num_Users,
-       ROUND(AVG(tenure_in_days)) AS Avg_Num_Days
+select
+badge_name,
+days_between_account_creation_and_Latest_badge
+from (
+SELECT
+  badges.user_id AS user_id,
+  users.display_name,
+  badges.name AS badge_name,
+  TIMESTAMP_DIFF(badges.date, users.creation_date, DAY) AS days_between_badges,
+  TIMESTAMP_DIFF(MAX(badges.date) OVER(PARTITION BY badges.user_id), users.creation_date, DAY) AS days_between_account_creation_and_Latest_badge,
+  ROW_NUMBER() OVER (PARTITION BY badges.user_id ORDER BY badges.date) AS row_number
 FROM
-(
-  SELECT 
-    badges.user_id AS user_id,
-    badges.name AS badge_name,
-    TIMESTAMP_DIFF(badges.date, users.creation_date, DAY) AS tenure_in_days,
-    ROW_NUMBER() OVER (PARTITION BY badges.user_id
-                       ORDER BY badges.date) AS row_number
-  FROM 
-    `bigquery-public-data.stackoverflow.badges` badges
-  JOIN
-    `bigquery-public-data.stackoverflow.users` users
-  ON badges.user_id = users.id
-  WHERE badges.class = 1
-) 
-WHERE tenure_in_days>365  and row_number >5
-GROUP BY First_Gold_Badge
-ORDER BY Num_Users ASC
-LIMIT 10
+  `bigquery-public-data.stackoverflow.badges` badges
+JOIN
+  `bigquery-public-data.stackoverflow.users` users
+ON
+  badges.user_id = users.id
+WHERE
+  TIMESTAMP_DIFF(CURRENT_TIMESTAMP, users.creation_date, DAY) > 365
+  AND users.id IN (
+  SELECT
+    user_id
+  FROM (
+    SELECT
+      answers.owner_user_id as user_id,
+      COUNT(answers.id) answer_cnt
+    FROM
+      `seismic-sweep-264823`.stackoverflow_caliva.posts_answers answers
+    GROUP BY
+      answers.owner_user_id)
+  WHERE
+    answer_cnt>10)  
+)
+where row_number > 5
+order by days_between_account_creation_and_Latest_badge desc
+limit 10
